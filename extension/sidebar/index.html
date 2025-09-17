@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar-container">
+        <header class="sidebar-header">
+            <h1>Copilot Platform</h1>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="sidebar-main">
+            <div class="llm-selector">
+                <label for="llmProvider">LLM Provider:</label>
+                <select id="llmProvider">
+                    <option value="local">Local</option>
+                    <option value="onprem">On-Prem</option>
+                    <option value="openai" selected>OpenAI</option>
+                    <option value="gemini">Gemini</option>
+                </select>
+            </div>
+
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="message assistant">
+                        <p>Hello! I'm your AI copilot. How can I help you today?</p>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Ask me anything or describe what you need help with..."
+                        rows="3"
+                    ></textarea>
+                    <button id="sendButton" class="send-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="context-info" id="contextInfo">
+                <h3>Context</h3>
+                <div class="context-item" id="selectedTextInfo" style="display: none;">
+                    <strong>Selected Text:</strong>
+                    <span id="selectedTextPreview"></span>
+                </div>
+                <div class="context-item" id="pdfTextInfo" style="display: none;">
+                    <strong>PDF Content:</strong>
+                    <span id="pdfTextPreview"></span>
+                </div>
+            </div>
+        </main>
+
+        <footer class="sidebar-footer">
+            <div class="settings">
+                <button id="settingsBtn" class="settings-btn">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="sidebar.js"></script>
+</body>
+</html>

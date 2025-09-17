@@ -31,13 +31,18 @@ class CopilotBackground {
                     sendResponse(content);
                     break;
                 
-                case 'CONTEXT_ACTION':
-                    await this.handleContextAction(request, sender);
+                case 'SELECTED_TEXT':
+                    await this.handleSelectedText(request, sender);
                     sendResponse({ success: true });
                     break;
                 
-                case 'PAGE_CHANGED':
-                    await this.handlePageChange(request, sender);
+                case 'PDF_TEXT_EXTRACTED':
+                    await this.handlePDFText(request, sender);
+                    sendResponse({ success: true });
+                    break;
+                
+                case 'HIGHLIGHT_TEXT':
+                    await this.highlightText(request, sender);
                     sendResponse({ success: true });
                     break;
                 
@@ -60,6 +65,7 @@ class CopilotBackground {
                 body: JSON.stringify({
                     message: request.message,
                     url: request.url,
+                    llm_provider: request.llm_provider,
                     timestamp: new Date().toISOString()
                 })
             });
@@ -87,45 +93,48 @@ class CopilotBackground {
         });
     }
 
-    async handleContextAction(request, sender) {
-        const actions = {
-            ask: `Can you explain this text: "${request.text}"`,
-            summarize: `Please summarize this text: "${request.text}"`,
-            translate: `Translate this text to English: "${request.text}"`,
-            extract: `Extract the key points from this text: "${request.text}"`
-        };
-
-        const message = actions[request.action];
-        if (message) {
-            // Send to sidebar if open
-            chrome.runtime.sendMessage({
-                type: 'CONTEXT_MESSAGE',
-                message: message,
-                url: request.url
-            });
-        }
+    async handleSelectedText(request, sender) {
+        console.log('Selected text received:', request.text);
+        
+        // Store selected text for sidebar access
+        await chrome.storage.local.set({
+            selectedText: request.text,
+            selectedUrl: sender.tab.url,
+            timestamp: Date.now()
+        });
+        
+        // Notify sidebar if open
+        chrome.runtime.sendMessage({
+            type: 'TEXT_SELECTED',
+            text: request.text,
+            url: sender.tab.url
+        });
     }
 
-    async handlePageChange(request, sender) {
-        // Log page changes for analytics/debugging
-        console.log('Page changed:', request.url, request.title);
+    async handlePDFText(request, sender) {
+        console.log('PDF text extracted:', request.text.length, 'characters');
         
-        // Could send to agent for processing
-        try {
-            await fetch(`${this.agentUrl}/api/page-change`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    url: request.url,
-                    title: request.title,
-                    timestamp: new Date().toISOString()
-                })
-            });
-        } catch (error) {
-            console.error('Error reporting page change:', error);
-        }
+        // Store PDF text for sidebar access
+        await chrome.storage.local.set({
+            pdfText: request.text,
+            pdfUrl: sender.tab.url,
+            timestamp: Date.now()
+        });
+        
+        // Notify sidebar if open
+        chrome.runtime.sendMessage({
+            type: 'PDF_TEXT_READY',
+            text: request.text,
+            url: sender.tab.url
+        });
+    }
+
+    async highlightText(request, sender) {
+        // Send highlight request to content script
+        chrome.tabs.sendMessage(sender.tab.id, {
+            type: 'HIGHLIGHT_SPANS',
+            spans: request.spans
+        });
     }
 
     setupContextMenus() {
@@ -187,8 +196,10 @@ class CopilotBackground {
     }
 
     async handleTabUpdate(tab) {
-        // Could inject content script or notify agent
-        console.log('Tab updated:', tab.url);
+        // Check if it's a PDF
+        if (tab.url && tab.url.includes('.pdf')) {
+            console.log('PDF detected:', tab.url);
+        }
     }
 }
 
