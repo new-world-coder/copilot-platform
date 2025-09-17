@@ -1,0 +1,68 @@
+/* Content script styles for Copilot Platform Extension */
+
+.copilot-highlight {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    border: 1px solid #007bff !important;
+    border-radius: 3px !important;
+}
+
+.copilot-selection {
+    background-color: rgba(255, 193, 7, 0.3) !important;
+    border: 1px solid #ffc107 !important;
+    border-radius: 3px !important;
+}
+
+#copilot-context-menu {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#copilot-context-menu div:hover {
+    background-color: #f0f0f0 !important;
+}
+
+#copilot-overlay {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#copilot-overlay h3 {
+    color: #333;
+    font-weight: 600;
+}
+
+#copilot-overlay button {
+    color: #666;
+    transition: color 0.2s;
+}
+
+#copilot-overlay button:hover {
+    color: #333;
+}
+
+/* Ensure overlay appears above other elements */
+#copilot-overlay {
+    z-index: 2147483647 !important;
+}
+
+/* Context menu positioning */
+#copilot-context-menu {
+    z-index: 2147483647 !important;
+}
+
+/* Smooth transitions for highlights */
+.copilot-highlight,
+.copilot-selection {
+    transition: all 0.3s ease !important;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    #copilot-overlay {
+        width: calc(100vw - 40px) !important;
+        right: 20px !important;
+        left: 20px !important;
+    }
+    
+    #copilot-context-menu {
+        min-width: 150px !important;
+    }
+}
