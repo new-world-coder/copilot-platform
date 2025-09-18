@@ -1,0 +1,115 @@
+# Copilot Platform Desktop Agent Configuration
+
+# Server Configuration
+server:
+  host: "localhost"
+  port: 8000
+  debug: false
+
+# LLM Configuration
+llm:
+  default_provider: "openai"
+  default_model: "gpt-4"
+  providers:
+    openai:
+      api_key: "${OPENAI_API_KEY}"
+      models:
+        - "gpt-4"
+        - "gpt-3.5-turbo"
+        - "gpt-4-turbo"
+        - "gpt-4-turbo-preview"
+    anthropic:
+      api_key: "${ANTHROPIC_API_KEY}"
+      models:
+        - "claude-3-sonnet-20240229"
+        - "claude-3-haiku-20240307"
+        - "claude-3-opus-20240229"
+    local:
+      base_url: "http://localhost:11434"
+      models:
+        - "llama2"
+        - "llama2:7b"
+        - "llama2:13b"
+        - "mistral"
+        - "mistral:7b"
+        - "codellama"
+        - "codellama:7b"
+        - "codellama:13b"
+        - "phi"
+        - "phi:3b"
+    onprem:
+      base_url: "http://localhost:8080"
+      models:
+        - "custom-model-1"
+        - "custom-model-2"
+        - "vllm-model"
+        - "triton-model"
+    gemini:
+      api_key: "${GEMINI_API_KEY}"
+      models:
+        - "gemini-pro"
+        - "gemini-pro-vision"
+        - "gemini-ultra"
+        - "gemini-1.5-pro"
+        - "gemini-1.5-flash"
+
+# PDF Processing Configuration
+pdf:
+  max_file_size: "10MB"
+  supported_formats:
+    - "pdf"
+  extraction_methods:
+    - "pymupdf"
+    - "pdfplumber"
+    - "pdfminer"
+
+# Search Configuration
+search:
+  providers:
+    google:
+      api_key: "${GOOGLE_SEARCH_API_KEY}"
+      search_engine_id: "${GOOGLE_SEARCH_ENGINE_ID}"
+    duckduckgo:
+      enabled: true
+    bing:
+      api_key: "${BING_SEARCH_API_KEY}"
+  default_provider: "duckduckgo"
+  max_results: 10
+
+# Database Configuration
+database:
+  url: "sqlite:///./copilot.db"
+  echo: false
+
+# RAG Configuration
+rag:
+  embedding_model: "text-embedding-ada-002"
+  vector_store_path: "./data/vector_store"
+  chunk_size: 1000
+  chunk_overlap: 200
+
+# Security Configuration
+security:
+  secret_key: "${SECRET_KEY}"
+  access_token_expire_minutes: 30
+  cors_origins:
+    - "http://localhost:3000"
+    - "chrome-extension://*"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/agent.log"
+
+# Task Configuration
+tasks:
+  max_concurrent: 5
+  timeout: 300
+  retry_attempts: 3
+
+# Cache Configuration
+cache:
+  enabled: true
+  ttl: 3600
+  max_size: 1000
