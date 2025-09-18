@@ -1,0 +1,32 @@
+ROE v. WADE
+Supreme Court of the United States
+410 U.S. 113 (1973)
+
+JUSTICE BLACKMUN delivered the opinion of the Court.
+
+FACTS:
+Jane Roe, a pregnant single woman, brought a class action challenging the constitutionality of the Texas criminal abortion laws, which proscribe procuring or attempting an abortion except on medical advice for the purpose of saving the mother's life.
+
+The case was brought against Henry Wade, the District Attorney of Dallas County, Texas, who was responsible for enforcing the abortion laws.
+
+ISSUE:
+Whether the Texas criminal abortion statutes, which prohibit abortions except to save the life of the mother, violate the Due Process Clause of the Fourteenth Amendment.
+
+HOLDING:
+The Supreme Court held that the Texas criminal abortion statutes are unconstitutional and that a woman has a constitutional right to choose to have an abortion.
+
+REASONING:
+The Court recognized that the right to privacy is broad enough to encompass a woman's decision whether or not to terminate her pregnancy. This right is not absolute, however, and must be considered against important state interests in regulation.
+
+The Court established a trimester framework:
+- First trimester: The abortion decision must be left to the woman and her attending physician.
+- Second trimester: The state may regulate abortion procedures in ways reasonably related to maternal health.
+- Third trimester: The state may regulate or even proscribe abortion except where necessary to preserve the life or health of the mother.
+
+CONCLUSION:
+The Court held that the Texas statutes are unconstitutional and enjoined their enforcement.
+
+SIGNIFICANCE:
+This landmark decision established a woman's constitutional right to abortion and created the framework for abortion regulation that remained in place until it was overturned in Dobbs v. Jackson Women's Health Organization (2022).
+
+The decision was highly controversial and remains one of the most debated Supreme Court cases in American history.

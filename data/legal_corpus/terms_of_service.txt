@@ -1,0 +1,47 @@
+TERMS OF SERVICE
+
+Last Updated: January 1, 2024
+
+1. ACCEPTANCE OF TERMS
+By accessing or using our services, you agree to be bound by these Terms of Service and all applicable laws and regulations.
+
+2. DESCRIPTION OF SERVICE
+We provide a platform that connects users with various services and resources. Our service includes but is not limited to:
+- User account management
+- Content delivery and streaming
+- Communication tools
+- Payment processing
+
+3. USER ACCOUNTS
+You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+
+4. ACCEPTABLE USE
+You agree not to use our services for any unlawful purpose or in any way that could damage, disable, or impair our services. Prohibited activities include:
+- Violating any applicable laws or regulations
+- Infringing on intellectual property rights
+- Transmitting harmful or malicious code
+- Attempting to gain unauthorized access to our systems
+
+5. INTELLECTUAL PROPERTY
+All content, features, and functionality of our services are owned by us and are protected by copyright, trademark, and other intellectual property laws.
+
+6. PAYMENT TERMS
+If you purchase a subscription or other paid services, you agree to pay all applicable fees and taxes. All fees are non-refundable unless otherwise specified.
+
+7. TERMINATION
+We may terminate or suspend your account at any time for violation of these terms or for any other reason at our sole discretion.
+
+8. DISCLAIMER OF WARRANTIES
+Our services are provided "as is" without warranty of any kind. We disclaim all warranties, express or implied, including but not limited to warranties of merchantability and fitness for a particular purpose.
+
+9. LIMITATION OF LIABILITY
+In no event shall we be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of our services.
+
+10. GOVERNING LAW
+These terms shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to conflict of law principles.
+
+11. MODIFICATIONS
+We reserve the right to modify these terms at any time. We will notify users of material changes by posting the updated terms on our website.
+
+12. CONTACT INFORMATION
+If you have questions about these terms, please contact us at legal@company.com.

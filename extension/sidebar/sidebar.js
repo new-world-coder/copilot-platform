@@ -60,16 +60,17 @@ class CopilotSidebar {
         this.sendButton.disabled = true;
 
         try {
-            // Send message to background script
+            // Send message to background script with RAG enabled
             const response = await chrome.runtime.sendMessage({
-                type: 'SEND_MESSAGE',
+                type: 'SEND_RAG_MESSAGE',
                 message: message,
                 url: await this.getCurrentTabUrl(),
-                llm_provider: this.llmProvider.value
+                llm_provider: this.llmProvider.value,
+                use_rag: true
             });
 
-            // Add assistant response to UI
-            this.addMessage(response.message, 'assistant');
+            // Add assistant response to UI with citations
+            this.addMessageWithCitations(response.answer, response.citations, 'assistant');
         } catch (error) {
             console.error('Error sending message:', error);
             this.addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
@@ -86,6 +87,62 @@ class CopilotSidebar {
         const p = document.createElement('p');
         p.textContent = content;
         messageDiv.appendChild(p);
+        
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    addMessageWithCitations(content, citations, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        // Add main answer
+        const p = document.createElement('p');
+        p.textContent = content;
+        messageDiv.appendChild(p);
+        
+        // Add citations if available
+        if (citations && citations.length > 0) {
+            const citationsDiv = document.createElement('div');
+            citationsDiv.className = 'citations';
+            
+            const citationsHeader = document.createElement('div');
+            citationsHeader.className = 'citations-header';
+            citationsHeader.textContent = `📚 Sources (${citations.length})`;
+            citationsDiv.appendChild(citationsHeader);
+            
+            citations.forEach((citation, index) => {
+                const citationItem = document.createElement('div');
+                citationItem.className = 'citation-item';
+                
+                const citationTitle = document.createElement('div');
+                citationTitle.className = 'citation-title';
+                citationTitle.textContent = `${index + 1}. ${citation.source}`;
+                citationItem.appendChild(citationTitle);
+                
+                const citationMeta = document.createElement('div');
+                citationMeta.className = 'citation-meta';
+                citationMeta.innerHTML = `
+                    <span class="citation-type">${citation.document_type || 'Document'}</span>
+                    <span class="citation-score">Score: ${citation.similarity_score.toFixed(3)}</span>
+                `;
+                citationItem.appendChild(citationMeta);
+                
+                const citationPreview = document.createElement('div');
+                citationPreview.className = 'citation-preview';
+                citationPreview.textContent = citation.text_preview;
+                citationItem.appendChild(citationPreview);
+                
+                // Add click handler to expand/collapse
+                citationItem.addEventListener('click', () => {
+                    citationItem.classList.toggle('expanded');
+                });
+                
+                citationsDiv.appendChild(citationItem);
+            });
+            
+            messageDiv.appendChild(citationsDiv);
+        }
         
         this.messagesContainer.appendChild(messageDiv);
         this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;

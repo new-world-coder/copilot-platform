@@ -1,0 +1,31 @@
+SOFTWARE LICENSE AGREEMENT
+
+This Software License Agreement ("Agreement") is entered into on [DATE] between [LICENSOR NAME] ("Licensor") and [LICENSEE NAME] ("Licensee").
+
+1. GRANT OF LICENSE
+Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a non-exclusive, non-transferable license to use the Software solely for Licensee's internal business purposes.
+
+2. RESTRICTIONS
+Licensee shall not:
+(a) modify, adapt, or create derivative works of the Software;
+(b) reverse engineer, decompile, or disassemble the Software;
+(c) distribute, sublicense, or transfer the Software to any third party;
+(d) remove or alter any proprietary notices or labels on the Software.
+
+3. INTELLECTUAL PROPERTY
+All rights, title, and interest in and to the Software, including all intellectual property rights, shall remain with Licensor.
+
+4. TERMINATION
+This Agreement may be terminated by either party upon thirty (30) days written notice. Upon termination, Licensee shall cease all use of the Software and return or destroy all copies.
+
+5. DISCLAIMER OF WARRANTIES
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, OR USE.
+
+7. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of California.
+
+8. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements.

@@ -11,7 +11,7 @@ import yaml
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-from .routers import llm_router, pdf_router, search_router
+from .routers import llm_router, pdf_router, search_router, rag_router
 from .core.config import load_config
 
 
@@ -55,6 +55,7 @@ app.add_middleware(
 app.include_router(llm_router.router, prefix="/llm", tags=["llm"])
 app.include_router(pdf_router.router, prefix="/pdf", tags=["pdf"])
 app.include_router(search_router.router, prefix="/search", tags=["search"])
+app.include_router(rag_router.router, prefix="/rag", tags=["rag"])
 
 
 @app.get("/")

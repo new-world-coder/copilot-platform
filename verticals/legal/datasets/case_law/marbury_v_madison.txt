@@ -1,0 +1,29 @@
+MARBURY v. MADISON
+Supreme Court of the United States
+5 U.S. 137 (1803)
+
+CHIEF JUSTICE MARSHALL delivered the opinion of the Court.
+
+FACTS:
+At the last term, on the affidavits then read and filed with the clerk, a rule was granted in this case, requiring the Secretary of State to show cause why a mandamus should not issue, directing him to deliver to William Marbury his commission as a justice of the peace for the county of Washington, in the district of Columbia.
+
+The affidavits filed in the case state that the complainant was appointed to the office of justice of the peace for the county of Washington, in the district of Columbia, by the President of the United States; that his commission was signed by the President, and that the seal of the United States was in due form affixed to the commission by the Secretary of State.
+
+ISSUE:
+Whether the Supreme Court has the authority to issue a writ of mandamus to compel the Secretary of State to deliver a commission.
+
+HOLDING:
+The Supreme Court held that it does not have the authority to issue a writ of mandamus in this case, as the provision in the Judiciary Act of 1789 that purported to give the Court such authority is unconstitutional.
+
+REASONING:
+The Constitution establishes the Supreme Court's original jurisdiction in cases "affecting ambassadors, other public ministers and consuls, and those in which a state shall be a party." All other cases fall under the Court's appellate jurisdiction.
+
+The Judiciary Act of 1789 attempted to extend the Court's original jurisdiction to include cases involving writs of mandamus. However, Congress cannot expand the Court's original jurisdiction beyond what is specified in the Constitution.
+
+This case established the principle of judicial review, whereby the Supreme Court has the authority to declare acts of Congress unconstitutional.
+
+CONCLUSION:
+The Court dismissed the case for want of jurisdiction, but in doing so, established the fundamental principle that the Supreme Court has the power to review and invalidate laws that conflict with the Constitution.
+
+SIGNIFICANCE:
+This landmark case established the doctrine of judicial review, making the Supreme Court the final arbiter of constitutional questions and ensuring the supremacy of the Constitution over conflicting legislation.

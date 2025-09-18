@@ -26,6 +26,11 @@ class CopilotBackground {
                     sendResponse(response);
                     break;
                 
+                case 'SEND_RAG_MESSAGE':
+                    const ragResponse = await this.sendRAGToAgent(request);
+                    sendResponse(ragResponse);
+                    break;
+                
                 case 'GET_PAGE_CONTENT':
                     const content = await this.getPageContent(sender.tab.id);
                     sendResponse(content);
@@ -80,6 +85,46 @@ class CopilotBackground {
             console.error('Error communicating with agent:', error);
             return {
                 message: 'Sorry, I cannot connect to the AI agent. Please make sure the agent is running.',
+                error: true
+            };
+        }
+    }
+
+    async sendRAGToAgent(request) {
+        try {
+            const response = await fetch(`${this.agentUrl}/rag/query`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: request.message,
+                    model: request.llm_provider === 'local' ? 'local' : 'gpt-4',
+                    provider: request.llm_provider,
+                    top_k: 3,
+                    use_legal_rag: true,
+                    temperature: 0.7,
+                    max_tokens: 1000
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Agent responded with status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return {
+                answer: data.answer,
+                citations: data.citations,
+                query: data.query,
+                model: data.model,
+                provider: data.provider
+            };
+        } catch (error) {
+            console.error('Error communicating with RAG agent:', error);
+            return {
+                answer: 'Sorry, I cannot connect to the AI agent. Please make sure the agent is running.',
+                citations: [],
                 error: true
             };
         }
