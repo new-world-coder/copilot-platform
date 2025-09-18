@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def run_on_prem_llm(prompt: str, endpoint: str, model: str = "custom-model", **kwargs) -> str:
     """
-    Run on-premises LLM
+    Run on-premises LLM via configurable FastAPI endpoint
     
     Args:
         prompt: Input prompt for the LLM
@@ -26,30 +26,99 @@ async def run_on_prem_llm(prompt: str, endpoint: str, model: str = "custom-model
     try:
         logger.info(f"Running on-prem LLM '{model}' at {endpoint}")
         
-        # This would make HTTP request to on-premises LLM service
-        # For now, return placeholder response
+        # Validate endpoint
+        if not endpoint or not endpoint.startswith(('http://', 'https://')):
+            raise ValueError("Invalid endpoint URL")
         
-        response = f"On-Prem placeholder response from {model}:\n\n"
-        response += f"Endpoint: {endpoint}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This is a mock response from the on-premises {model} model. "
-        response += f"In a real implementation, this would make an HTTP request to {endpoint} "
-        response += f"with the prompt and return the generated response."
+        # Prepare request payload (OpenAI-compatible format)
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": kwargs.get("temperature", 0.7),
+            "max_tokens": kwargs.get("max_tokens", 1000),
+            "top_p": kwargs.get("top_p", 1.0),
+            "frequency_penalty": kwargs.get("frequency_penalty", 0.0),
+            "presence_penalty": kwargs.get("presence_penalty", 0.0),
+            "stop": kwargs.get("stop", None)
+        }
         
-        # Simulate processing time
-        await asyncio.sleep(0.2)
+        # Remove None values
+        payload = {k: v for k, v in payload.items() if v is not None}
         
-        logger.info(f"On-prem LLM '{model}' completed successfully")
-        return response
+        # Try OpenAI-compatible endpoint first
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
+                    f"{endpoint}/v1/chat/completions",
+                    json=payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    llm_response = result["choices"][0]["message"]["content"]
+                    logger.info(f"On-prem LLM '{model}' completed successfully")
+                    return llm_response
+                else:
+                    logger.warning(f"OpenAI-compatible endpoint failed: {response.status_code}")
+        except Exception as e:
+            logger.warning(f"OpenAI-compatible endpoint failed: {e}")
+        
+        # Try alternative completion endpoint
+        try:
+            completion_payload = {
+                "model": model,
+                "prompt": prompt,
+                "temperature": kwargs.get("temperature", 0.7),
+                "max_tokens": kwargs.get("max_tokens", 1000),
+                "top_p": kwargs.get("top_p", 1.0),
+                "stop": kwargs.get("stop", None)
+            }
+            completion_payload = {k: v for k, v in completion_payload.items() if v is not None}
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
+                    f"{endpoint}/v1/completions",
+                    json=completion_payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    llm_response = result["choices"][0]["text"]
+                    logger.info(f"On-prem LLM '{model}' completed successfully")
+                    return llm_response
+                else:
+                    logger.warning(f"Completion endpoint failed: {response.status_code}")
+        except Exception as e:
+            logger.warning(f"Completion endpoint failed: {e}")
+        
+        # If all endpoints fail, return fallback response
+        return await _fallback_response(prompt, model, endpoint)
         
     except Exception as e:
         logger.error(f"Error running on-prem LLM '{model}': {e}")
-        raise
+        return await _fallback_response(prompt, model, endpoint)
+
+
+async def _fallback_response(prompt: str, model: str, endpoint: str) -> str:
+    """Fallback response when service is not available"""
+    response = f"On-Premises {model} response (service unavailable):\n\n"
+    response += f"Endpoint: {endpoint}\n"
+    response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
+    response += f"This is a fallback response. The on-premises service at {endpoint} "
+    response += f"is not accessible. Please check the endpoint URL and ensure the service is running."
+    
+    # Simulate processing time
+    await asyncio.sleep(0.1)
+    return response
 
 
 async def run_vllm_llm(prompt: str, endpoint: str, model: str = "custom", **kwargs) -> str:
     """
-    Run vLLM on-premises LLM
+    Run vLLM on-premises LLM (alias for run_on_prem_llm)
     
     Args:
         prompt: Input prompt
@@ -60,26 +129,12 @@ async def run_vllm_llm(prompt: str, endpoint: str, model: str = "custom", **kwar
     Returns:
         LLM response
     """
-    try:
-        # This would make request to vLLM API
-        # Example: POST {endpoint}/v1/completions
-        
-        response = f"vLLM {model} response:\n\n"
-        response += f"Endpoint: {endpoint}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would connect to vLLM API at {endpoint} "
-        response += f"and use the {model} model for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running vLLM '{model}': {e}")
-        raise
+    return await run_on_prem_llm(prompt, endpoint, model, **kwargs)
 
 
 async def run_triton_llm(prompt: str, endpoint: str, model: str = "custom", **kwargs) -> str:
     """
-    Run NVIDIA Triton Inference Server LLM
+    Run NVIDIA Triton Inference Server LLM (alias for run_on_prem_llm)
     
     Args:
         prompt: Input prompt
@@ -90,25 +145,12 @@ async def run_triton_llm(prompt: str, endpoint: str, model: str = "custom", **kw
     Returns:
         LLM response
     """
-    try:
-        # This would connect to Triton Inference Server
-        
-        response = f"Triton {model} response:\n\n"
-        response += f"Endpoint: {endpoint}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would connect to Triton Inference Server at {endpoint} "
-        response += f"and use the {model} model for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running Triton LLM '{model}': {e}")
-        raise
+    return await run_on_prem_llm(prompt, endpoint, model, **kwargs)
 
 
 async def run_custom_api_llm(prompt: str, endpoint: str, model: str = "custom", **kwargs) -> str:
     """
-    Run custom API LLM
+    Run custom API LLM (alias for run_on_prem_llm)
     
     Args:
         prompt: Input prompt
@@ -119,21 +161,7 @@ async def run_custom_api_llm(prompt: str, endpoint: str, model: str = "custom", 
     Returns:
         LLM response
     """
-    try:
-        # This would make request to custom API
-        # Supports various API formats
-        
-        response = f"Custom API {model} response:\n\n"
-        response += f"Endpoint: {endpoint}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would connect to custom API at {endpoint} "
-        response += f"and use the {model} model for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running custom API LLM '{model}': {e}")
-        raise
+    return await run_on_prem_llm(prompt, endpoint, model, **kwargs)
 
 
 async def check_on_prem_health(endpoint: str) -> bool:

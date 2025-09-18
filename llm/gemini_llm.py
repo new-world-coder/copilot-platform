@@ -3,15 +3,17 @@ Google Gemini LLM Integration
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import asyncio
+import httpx
+import json
 
 logger = logging.getLogger(__name__)
 
 
 async def run_gemini_llm(prompt: str, api_key: str, model: str = "gemini-pro", **kwargs) -> str:
     """
-    Run Google Gemini LLM
+    Run Google Gemini LLM via Generative AI API
     
     Args:
         prompt: Input prompt for the LLM
@@ -25,25 +27,78 @@ async def run_gemini_llm(prompt: str, api_key: str, model: str = "gemini-pro", *
     try:
         logger.info(f"Running Gemini LLM '{model}' with prompt length: {len(prompt)}")
         
-        # This would integrate with actual Google Gemini API
-        # For now, return placeholder response
+        # Validate API key
+        if not api_key or len(api_key) < 20:
+            raise ValueError("Invalid Google AI API key format")
         
-        response = f"Gemini placeholder response from {model}:\n\n"
-        response += f"API Key: {api_key[:8]}...{api_key[-4:] if len(api_key) > 12 else '***'}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This is a mock response from the Google Gemini {model} model. "
-        response += f"In a real implementation, this would make an API call to Google AI "
-        response += f"using the provided API key and return the generated response."
+        # Prepare request payload
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "temperature": kwargs.get("temperature", 0.7),
+                "topK": kwargs.get("top_k", 40),
+                "topP": kwargs.get("top_p", 0.95),
+                "maxOutputTokens": kwargs.get("max_tokens", 1000),
+                "stopSequences": kwargs.get("stop", [])
+            }
+        }
         
-        # Simulate processing time
-        await asyncio.sleep(0.1)
+        # Add safety settings if provided
+        if kwargs.get("safety_settings"):
+            payload["safetySettings"] = kwargs["safety_settings"]
         
-        logger.info(f"Gemini LLM '{model}' completed successfully")
-        return response
+        # Make API request to Google Gemini
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        params = {"key": api_key}
         
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                url,
+                json=payload,
+                params=params,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                candidates = result.get("candidates", [])
+                
+                if candidates and "content" in candidates[0]:
+                    llm_response = candidates[0]["content"]["parts"][0]["text"]
+                    logger.info(f"Gemini LLM '{model}' completed successfully")
+                    return llm_response
+                else:
+                    raise Exception("No valid response from Gemini API")
+            else:
+                error_data = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
+                error_msg = error_data.get("error", {}).get("message", response.text)
+                logger.error(f"Gemini API error: {response.status_code} - {error_msg}")
+                raise Exception(f"Gemini API error: {error_msg}")
+        
+    except httpx.ConnectError:
+        logger.warning("Gemini API connection failed, falling back to placeholder")
+        return await _fallback_response(prompt, model, "Gemini")
     except Exception as e:
         logger.error(f"Error running Gemini LLM '{model}': {e}")
-        raise
+        return await _fallback_response(prompt, model, "Gemini")
+
+
+async def _fallback_response(prompt: str, model: str, service: str) -> str:
+    """Fallback response when service is not available"""
+    response = f"{service} {model} response (service unavailable):\n\n"
+    response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
+    response += f"This is a fallback response. The {service} service is not accessible. "
+    response += f"Please check your API key and network connection."
+    
+    # Simulate processing time
+    await asyncio.sleep(0.1)
+    return response
 
 
 async def run_gemini_pro(prompt: str, api_key: str, **kwargs) -> str:
@@ -58,17 +113,7 @@ async def run_gemini_pro(prompt: str, api_key: str, **kwargs) -> str:
     Returns:
         LLM response
     """
-    try:
-        response = f"Gemini Pro response:\n\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would use the Gemini Pro model via Google AI API "
-        response += f"with the provided API key for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running Gemini Pro: {e}")
-        raise
+    return await run_gemini_llm(prompt, api_key, "gemini-pro", **kwargs)
 
 
 async def run_gemini_pro_vision(prompt: str, api_key: str, image_data: str = None, **kwargs) -> str:

@@ -152,9 +152,12 @@ async def process_local_query(text: str, model: str, temperature: float, max_tok
     try:
         from llm.local_llm import run_local_llm
         
+        base_url = config.get("base_url", "http://localhost:11434")
+        
         return await run_local_llm(
             prompt=text,
             model=model,
+            base_url=base_url,
             temperature=temperature,
             max_tokens=max_tokens
         )

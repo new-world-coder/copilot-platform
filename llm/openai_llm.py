@@ -3,15 +3,17 @@ OpenAI LLM Integration
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import asyncio
+import httpx
+import json
 
 logger = logging.getLogger(__name__)
 
 
 async def run_openai_llm(prompt: str, api_key: str, model: str = "gpt-4", **kwargs) -> str:
     """
-    Run OpenAI LLM
+    Run OpenAI LLM via Chat Completions API
     
     Args:
         prompt: Input prompt for the LLM
@@ -25,25 +27,70 @@ async def run_openai_llm(prompt: str, api_key: str, model: str = "gpt-4", **kwar
     try:
         logger.info(f"Running OpenAI LLM '{model}' with prompt length: {len(prompt)}")
         
-        # This would integrate with actual OpenAI API
-        # For now, return placeholder response
+        # Validate API key
+        if not api_key or not api_key.startswith('sk-'):
+            raise ValueError("Invalid OpenAI API key format")
         
-        response = f"OpenAI placeholder response from {model}:\n\n"
-        response += f"API Key: {api_key[:8]}...{api_key[-4:] if len(api_key) > 12 else '***'}\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This is a mock response from the OpenAI {model} model. "
-        response += f"In a real implementation, this would make an API call to OpenAI "
-        response += f"using the provided API key and return the generated response."
+        # Prepare request payload
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": kwargs.get("temperature", 0.7),
+            "max_tokens": kwargs.get("max_tokens", 1000),
+            "top_p": kwargs.get("top_p", 1.0),
+            "frequency_penalty": kwargs.get("frequency_penalty", 0.0),
+            "presence_penalty": kwargs.get("presence_penalty", 0.0),
+            "stop": kwargs.get("stop", None)
+        }
         
-        # Simulate processing time
-        await asyncio.sleep(0.1)
+        # Remove None values
+        payload = {k: v for k, v in payload.items() if v is not None}
         
-        logger.info(f"OpenAI LLM '{model}' completed successfully")
-        return response
+        # Make API request to OpenAI
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
         
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                json=payload,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                llm_response = result["choices"][0]["message"]["content"]
+                
+                logger.info(f"OpenAI LLM '{model}' completed successfully")
+                return llm_response
+            else:
+                error_data = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
+                error_msg = error_data.get("error", {}).get("message", response.text)
+                logger.error(f"OpenAI API error: {response.status_code} - {error_msg}")
+                raise Exception(f"OpenAI API error: {error_msg}")
+        
+    except httpx.ConnectError:
+        logger.warning("OpenAI API connection failed, falling back to placeholder")
+        return await _fallback_response(prompt, model, "OpenAI")
     except Exception as e:
         logger.error(f"Error running OpenAI LLM '{model}': {e}")
-        raise
+        return await _fallback_response(prompt, model, "OpenAI")
+
+
+async def _fallback_response(prompt: str, model: str, service: str) -> str:
+    """Fallback response when service is not available"""
+    response = f"{service} {model} response (service unavailable):\n\n"
+    response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
+    response += f"This is a fallback response. The {service} service is not accessible. "
+    response += f"Please check your API key and network connection."
+    
+    # Simulate processing time
+    await asyncio.sleep(0.1)
+    return response
 
 
 async def run_gpt4(prompt: str, api_key: str, **kwargs) -> str:
@@ -58,17 +105,7 @@ async def run_gpt4(prompt: str, api_key: str, **kwargs) -> str:
     Returns:
         LLM response
     """
-    try:
-        response = f"GPT-4 response:\n\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would use the GPT-4 model via OpenAI API "
-        response += f"with the provided API key for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running GPT-4: {e}")
-        raise
+    return await run_openai_llm(prompt, api_key, "gpt-4", **kwargs)
 
 
 async def run_gpt35_turbo(prompt: str, api_key: str, **kwargs) -> str:
@@ -83,17 +120,7 @@ async def run_gpt35_turbo(prompt: str, api_key: str, **kwargs) -> str:
     Returns:
         LLM response
     """
-    try:
-        response = f"GPT-3.5 Turbo response:\n\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would use the GPT-3.5 Turbo model via OpenAI API "
-        response += f"with the provided API key for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running GPT-3.5 Turbo: {e}")
-        raise
+    return await run_openai_llm(prompt, api_key, "gpt-3.5-turbo", **kwargs)
 
 
 async def run_gpt4_turbo(prompt: str, api_key: str, **kwargs) -> str:
@@ -108,17 +135,7 @@ async def run_gpt4_turbo(prompt: str, api_key: str, **kwargs) -> str:
     Returns:
         LLM response
     """
-    try:
-        response = f"GPT-4 Turbo response:\n\n"
-        response += f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}\n\n"
-        response += f"This would use the GPT-4 Turbo model via OpenAI API "
-        response += f"with the provided API key for generation."
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Error running GPT-4 Turbo: {e}")
-        raise
+    return await run_openai_llm(prompt, api_key, "gpt-4-turbo", **kwargs)
 
 
 def get_available_openai_models() -> list:
