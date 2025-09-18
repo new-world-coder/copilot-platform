@@ -2,6 +2,7 @@
  * Watermark Remover Content Script
  * Removes "Made with Emergent" watermark from the page
  */
+debugger; // Breakpoint for debugging
 
 (function() {
     'use strict';
