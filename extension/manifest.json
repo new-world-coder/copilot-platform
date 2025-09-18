@@ -20,7 +20,6 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "content/watermark_remover.js",
         "content/dom_capture.js",
         "content/pdf_capture.js",
         "content/highlight_inject.js"
