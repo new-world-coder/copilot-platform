@@ -14,7 +14,7 @@ import numpy as np
 import faiss
 from tqdm import tqdm
 
-from embedder import Embedder
+from .embedder import Embedder
 
 logger = logging.getLogger(__name__)
 

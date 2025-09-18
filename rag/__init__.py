@@ -1,9 +1,19 @@
 """
-RAG (Retrieval-Augmented Generation) components for embedding, indexing, and retrieval
+RAG (Retrieval-Augmented Generation) module for the Copilot Platform.
+
+This module provides:
+- Document embedding using sentence-transformers
+- FAISS-based document indexing and retrieval
+- Legal document processing and citation generation
 """
 
-from .embedding_service import EmbeddingService
-from .vector_store import VectorStore
-from .retrieval_service import RetrievalService
+from .embedder import Embedder
+from .indexer import DocumentIndexer
+from .retriever import DocumentRetriever, create_retriever
 
-__all__ = ['EmbeddingService', 'VectorStore', 'RetrievalService']
+__all__ = [
+    "Embedder",
+    "DocumentIndexer", 
+    "DocumentRetriever",
+    "create_retriever"
+]

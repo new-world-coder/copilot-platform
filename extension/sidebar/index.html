@@ -27,36 +27,83 @@
                 </select>
             </div>
 
-            <div class="chat-container">
-                <div class="messages" id="messages">
-                    <div class="message assistant">
-                        <p>Hello! I'm your AI copilot. How can I help you today?</p>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="chat">💬 Chat</button>
+                <button class="tab-button" data-tab="tasks">📋 Tasks</button>
+            </div>
+
+            <!-- Chat Tab -->
+            <div class="tab-content active" id="chatTab">
+                <div class="chat-container">
+                    <div class="messages" id="messages">
+                        <div class="message assistant">
+                            <p>Hello! I'm your AI copilot. How can I help you today?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask me anything or describe what you need help with..."
+                            rows="3"
+                        ></textarea>
+                        <button id="sendButton" class="send-button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-                
-                <div class="input-container">
-                    <textarea 
-                        id="messageInput" 
-                        placeholder="Ask me anything or describe what you need help with..."
-                        rows="3"
-                    ></textarea>
-                    <button id="sendButton" class="send-button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
-                        </svg>
-                    </button>
+
+                <div class="context-info" id="contextInfo">
+                    <h3>Context</h3>
+                    <div class="context-item" id="selectedTextInfo" style="display: none;">
+                        <strong>Selected Text:</strong>
+                        <span id="selectedTextPreview"></span>
+                    </div>
+                    <div class="context-item" id="pdfTextInfo" style="display: none;">
+                        <strong>PDF Content:</strong>
+                        <span id="pdfTextPreview"></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="context-info" id="contextInfo">
-                <h3>Context</h3>
-                <div class="context-item" id="selectedTextInfo" style="display: none;">
-                    <strong>Selected Text:</strong>
-                    <span id="selectedTextPreview"></span>
-                </div>
-                <div class="context-item" id="pdfTextInfo" style="display: none;">
-                    <strong>PDF Content:</strong>
-                    <span id="pdfTextPreview"></span>
+            <!-- Tasks Tab -->
+            <div class="tab-content" id="tasksTab">
+                <div class="tasks-container">
+                    <div class="tasks-header">
+                        <h3>📋 Extracted Tasks</h3>
+                        <div class="tasks-controls">
+                            <button id="extractTasksBtn" class="extract-tasks-btn">
+                                🔍 Extract Tasks
+                            </button>
+                            <button id="clearTasksBtn" class="clear-tasks-btn">
+                                🗑️ Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tasks-summary" id="tasksSummary">
+                        <div class="summary-item">
+                            <span class="summary-label">Total:</span>
+                            <span class="summary-value" id="totalTasks">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Pending:</span>
+                            <span class="summary-value" id="pendingTasks">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Completed:</span>
+                            <span class="summary-value" id="completedTasks">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="tasks-list" id="tasksList">
+                        <div class="no-tasks">
+                            <p>No tasks extracted yet. Select text or ask a question to extract tasks.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

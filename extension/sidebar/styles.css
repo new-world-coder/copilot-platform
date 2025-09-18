@@ -345,3 +345,273 @@ body {
 .citation-item:last-child {
     margin-bottom: 0;
 }
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    border-bottom: 1px solid #e1e5e9;
+    background: #f8f9fa;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.tab-button.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+    background: white;
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tasks Tab Styling */
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+}
+
+.tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.tasks-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.tasks-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.extract-tasks-btn,
+.clear-tasks-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.extract-tasks-btn {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.extract-tasks-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+.clear-tasks-btn {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.clear-tasks-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.tasks-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.summary-label {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.summary-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.tasks-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.no-tasks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+}
+
+.task-item {
+    margin-bottom: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+.task-item.completed {
+    background: #f8f9fa;
+    border-color: #28a745;
+}
+
+.task-item.completed .task-action {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+.task-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-action {
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.task-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.task-deadline {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.task-priority {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 10px;
+}
+
+.task-priority.high {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.task-priority.medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.task-priority.low {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.task-assignee {
+    color: #6c757d;
+}
+
+.task-context {
+    font-size: 12px;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f3f4;
+}
+
+.task-source {
+    font-size: 10px;
+    color: #adb5bd;
+    margin-top: 4px;
+}
+
+/* Task list scrollbar */
+.tasks-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tasks-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.tasks-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.tasks-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

@@ -12,6 +12,21 @@ class CopilotSidebar {
         this.pdfTextInfo = document.getElementById('pdfTextInfo');
         this.pdfTextPreview = document.getElementById('pdfTextPreview');
         
+        // Tasks tab elements
+        this.tasksList = document.getElementById('tasksList');
+        this.extractTasksBtn = document.getElementById('extractTasksBtn');
+        this.clearTasksBtn = document.getElementById('clearTasksBtn');
+        this.totalTasks = document.getElementById('totalTasks');
+        this.pendingTasks = document.getElementById('pendingTasks');
+        this.completedTasks = document.getElementById('completedTasks');
+        
+        // Tab elements
+        this.tabButtons = document.querySelectorAll('.tab-button');
+        this.tabContents = document.querySelectorAll('.tab-content');
+        
+        // Tasks storage
+        this.tasks = [];
+        
         this.init();
     }
 
@@ -20,6 +35,7 @@ class CopilotSidebar {
         this.checkConnection();
         this.loadSettings();
         this.loadContext();
+        this.loadTasks();
     }
 
     setupEventListeners() {
@@ -42,6 +58,22 @@ class CopilotSidebar {
         // Settings button
         document.getElementById('settingsBtn').addEventListener('click', () => {
             this.openSettings();
+        });
+
+        // Tab navigation
+        this.tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                this.switchTab(button.dataset.tab);
+            });
+        });
+
+        // Tasks buttons
+        this.extractTasksBtn.addEventListener('click', () => {
+            this.extractTasksFromContext();
+        });
+
+        this.clearTasksBtn.addEventListener('click', () => {
+            this.clearAllTasks();
         });
 
         // Listen for messages from background script
@@ -248,6 +280,175 @@ class CopilotSidebar {
     openSettings() {
         // Open settings popup or navigate to settings page
         chrome.runtime.openOptionsPage();
+    }
+
+    // Tab management
+    switchTab(tabName) {
+        // Update tab buttons
+        this.tabButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.tab === tabName);
+        });
+
+        // Update tab contents
+        this.tabContents.forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}Tab`);
+        });
+    }
+
+    // Task management
+    async extractTasksFromContext() {
+        try {
+            // Get context text (selected text or PDF text)
+            const contextText = this.getContextText();
+            
+            if (!contextText) {
+                alert('No text selected or PDF content available. Please select text or load a PDF first.');
+                return;
+            }
+
+            this.extractTasksBtn.disabled = true;
+            this.extractTasksBtn.textContent = '⏳ Extracting...';
+
+            // Send task extraction request to background script
+            const response = await chrome.runtime.sendMessage({
+                type: 'EXTRACT_TASKS',
+                text: contextText,
+                llm_provider: this.llmProvider.value
+            });
+
+            if (response.success && response.tasks) {
+                this.addTasks(response.tasks);
+                this.updateTasksSummary();
+            } else {
+                alert('Failed to extract tasks. Please try again.');
+            }
+
+        } catch (error) {
+            console.error('Error extracting tasks:', error);
+            alert('Error extracting tasks. Please try again.');
+        } finally {
+            this.extractTasksBtn.disabled = false;
+            this.extractTasksBtn.textContent = '🔍 Extract Tasks';
+        }
+    }
+
+    getContextText() {
+        // Get selected text
+        const selectedText = this.selectedTextPreview.textContent;
+        if (selectedText && selectedText !== '') {
+            return selectedText;
+        }
+
+        // Get PDF text
+        const pdfText = this.pdfTextPreview.textContent;
+        if (pdfText && pdfText !== '') {
+            return pdfText;
+        }
+
+        return null;
+    }
+
+    addTasks(tasks) {
+        tasks.forEach(task => {
+            const taskWithId = {
+                ...task,
+                id: Date.now() + Math.random(),
+                completed: false,
+                created_at: new Date().toISOString()
+            };
+            this.tasks.push(taskWithId);
+        });
+
+        this.renderTasks();
+        this.saveTasks();
+    }
+
+    renderTasks() {
+        if (this.tasks.length === 0) {
+            this.tasksList.innerHTML = '<div class="no-tasks"><p>No tasks extracted yet. Select text or ask a question to extract tasks.</p></div>';
+            return;
+        }
+
+        this.tasksList.innerHTML = this.tasks.map(task => this.createTaskHTML(task)).join('');
+        
+        // Add event listeners to checkboxes
+        this.tasksList.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const taskId = e.target.dataset.taskId;
+                this.toggleTask(taskId);
+            });
+        });
+    }
+
+    createTaskHTML(task) {
+        const priorityClass = task.priority || 'medium';
+        const completedClass = task.completed ? 'completed' : '';
+        
+        return `
+            <div class="task-item ${completedClass}">
+                <div class="task-header">
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}">
+                    <div class="task-content">
+                        <div class="task-action">${task.action || 'No action specified'}</div>
+                        <div class="task-meta">
+                            ${task.deadline ? `<span class="task-deadline">📅 ${task.deadline}</span>` : ''}
+                            <span class="task-priority ${priorityClass}">${priorityClass.toUpperCase()}</span>
+                            ${task.assignee ? `<span class="task-assignee">👤 ${task.assignee}</span>` : ''}
+                        </div>
+                        ${task.context ? `<div class="task-context">${task.context}</div>` : ''}
+                        ${task.source_text ? `<div class="task-source">Source: ${task.source_text.substring(0, 100)}...</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    toggleTask(taskId) {
+        const task = this.tasks.find(t => t.id == taskId);
+        if (task) {
+            task.completed = !task.completed;
+            this.renderTasks();
+            this.updateTasksSummary();
+            this.saveTasks();
+        }
+    }
+
+    clearAllTasks() {
+        if (confirm('Are you sure you want to clear all tasks?')) {
+            this.tasks = [];
+            this.renderTasks();
+            this.updateTasksSummary();
+            this.saveTasks();
+        }
+    }
+
+    updateTasksSummary() {
+        const total = this.tasks.length;
+        const completed = this.tasks.filter(t => t.completed).length;
+        const pending = total - completed;
+
+        this.totalTasks.textContent = total;
+        this.completedTasks.textContent = completed;
+        this.pendingTasks.textContent = pending;
+    }
+
+    async saveTasks() {
+        try {
+            await chrome.storage.local.set({ copilotTasks: this.tasks });
+        } catch (error) {
+            console.error('Error saving tasks:', error);
+        }
+    }
+
+    async loadTasks() {
+        try {
+            const result = await chrome.storage.local.get(['copilotTasks']);
+            this.tasks = result.copilotTasks || [];
+            this.renderTasks();
+            this.updateTasksSummary();
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+        }
     }
 }
 

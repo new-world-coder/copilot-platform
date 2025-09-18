@@ -2,7 +2,13 @@
 PDF Text Extraction Utilities
 """
 
-import fitz  # PyMuPDF
+try:
+    import fitz  # PyMuPDF
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
+    fitz = None
+
 import httpx
 import asyncio
 from typing import Union, Optional
@@ -27,6 +33,10 @@ async def extract_text_from_pdf(url_or_path: Union[str, Path]) -> str:
         ValueError: If file is not a PDF or cannot be accessed
         Exception: If extraction fails
     """
+    if not PYMUPDF_AVAILABLE:
+        logger.warning("PyMuPDF not available, returning placeholder text")
+        return f"[PDF text extraction not available - PyMuPDF not installed. File: {url_or_path}]"
+    
     try:
         # Determine if it's a URL or local path
         if is_url(url_or_path):
@@ -101,6 +111,9 @@ def read_local_pdf(path: Union[str, Path]) -> Optional[bytes]:
 
 def extract_text_from_bytes(pdf_content: bytes) -> str:
     """Extract text from PDF bytes using PyMuPDF"""
+    if not PYMUPDF_AVAILABLE:
+        return "[PDF text extraction not available - PyMuPDF not installed]"
+    
     try:
         doc = fitz.open(stream=pdf_content, filetype="pdf")
         text = ""

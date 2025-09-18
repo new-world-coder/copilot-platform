@@ -9,8 +9,8 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 
-from embedder import Embedder
-from indexer import DocumentIndexer
+from .embedder import Embedder
+from .indexer import DocumentIndexer
 
 logger = logging.getLogger(__name__)
 

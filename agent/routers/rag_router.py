@@ -15,7 +15,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from rag.retriever import DocumentRetriever, create_retriever
 from verticals.legal.legal_rag import LegalRAG, query_legal_docs
-from routers.llm_router import process_llm_query
+from .llm_router import process_llm_query
 
 logger = logging.getLogger(__name__)
 

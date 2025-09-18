@@ -51,6 +51,11 @@ class CopilotBackground {
                     sendResponse({ success: true });
                     break;
                 
+                case 'EXTRACT_TASKS':
+                    const taskResponse = await this.extractTasks(request);
+                    sendResponse(taskResponse);
+                    break;
+                
                 default:
                     sendResponse({ error: 'Unknown message type' });
             }
@@ -244,6 +249,40 @@ class CopilotBackground {
         // Check if it's a PDF
         if (tab.url && tab.url.includes('.pdf')) {
             console.log('PDF detected:', tab.url);
+        }
+    }
+
+    async extractTasks(request) {
+        try {
+            const response = await fetch(`${this.agentUrl}/tasks/extract`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: request.text,
+                    llm_provider: request.llm_provider,
+                    document_type: 'legal'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Agent responded with status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return {
+                success: true,
+                tasks: data.tasks || [],
+                extraction_method: data.extraction_method || 'unknown'
+            };
+        } catch (error) {
+            console.error('Error extracting tasks:', error);
+            return {
+                success: false,
+                error: error.message,
+                tasks: []
+            };
         }
     }
 }

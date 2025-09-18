@@ -2,20 +2,28 @@
 Reusable common task libraries for the Copilot Platform
 """
 
-from .pdf_utils import PDFProcessor, extract_pdf_summary
-from .web_search import WebSearcher, NewsSearcher, search_web, search_news
-from .task_extraction import TaskExtractor, extract_tasks_from_text
-from .dom_observer import DOMObserver, ElementTracker, FormObserver
-from .utils import (
-    TextUtils, DataUtils, TimeUtils, HashUtils, FileUtils,
-    ValidationUtils, RetryUtils, ConfigUtils
-)
+# Import only what actually exists
+try:
+    from .pdf_utils import extract_text_from_pdf, highlight_terms
+    PDF_UTILS_AVAILABLE = True
+except ImportError:
+    PDF_UTILS_AVAILABLE = False
+
+try:
+    from .web_search import search_web
+    WEB_SEARCH_AVAILABLE = True
+except ImportError:
+    WEB_SEARCH_AVAILABLE = False
+
+try:
+    from .task_extraction.llm_task_parser import TaskExtractor
+    TASK_EXTRACTION_AVAILABLE = True
+except ImportError:
+    TASK_EXTRACTION_AVAILABLE = False
 
 __all__ = [
-    'PDFProcessor', 'extract_pdf_summary',
-    'WebSearcher', 'NewsSearcher', 'search_web', 'search_news',
-    'TaskExtractor', 'extract_tasks_from_text',
-    'DOMObserver', 'ElementTracker', 'FormObserver',
-    'TextUtils', 'DataUtils', 'TimeUtils', 'HashUtils', 'FileUtils',
-    'ValidationUtils', 'RetryUtils', 'ConfigUtils'
+    'extract_text_from_pdf',
+    'highlight_terms', 
+    'search_web',
+    'TaskExtractor'
 ]
